@@ -10,6 +10,20 @@ class ATest {
         val evolvedCell = cell.evolveWithNeighborCount(3)
         assertThat(evolvedCell.status).isEqualTo(Status.ALIVE)
     }
+
+    @Test
+    fun `alive cell with one neighbor dies in next generation`() {
+        val cell = Cell(Status.ALIVE)
+        val evolvedCell = cell.evolveWithNeighborCount(1)
+        assertThat(evolvedCell.status).isEqualTo(Status.DEAD)
+    }
+
+    @Test
+    fun `alive cell with two neighbors stays alive`() {
+        val cell = Cell(Status.ALIVE)
+        val evolvedCell = cell.evolveWithNeighborCount(2)
+        assertThat(evolvedCell.status).isEqualTo(Status.ALIVE)
+    }
 }
 
 enum class Status {
@@ -19,6 +33,6 @@ enum class Status {
 
 class Cell(val status: Status) {
     fun evolveWithNeighborCount(neighborCount: Int): Cell {
-        return Cell(Status.ALIVE)
+        return if (neighborCount == 1) Cell(Status.DEAD) else Cell(Status.ALIVE)
     }
 }
