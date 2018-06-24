@@ -1,9 +1,9 @@
 package co.hodler.gameoflife
 
 import org.assertj.core.api.Assertions
-import org.junit.Test
+import org.junit.jupiter.api.Test
 
-class Test {
+class ATest {
 
     @Test
     fun `runs`() {
