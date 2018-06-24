@@ -2,13 +2,24 @@ package co.hodler.gameoflife
 
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.MethodSource
+import java.util.stream.Stream
 
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class ATest {
-    @Test
-    fun `dead cell is reborn if it has three neighbors`() {
-        val cell = Cell(Status.DEAD)
-        val evolvedCell = cell.evolveWithNeighborCount(3)
-        assertThat(evolvedCell.status).isEqualTo(Status.ALIVE)
+
+    private fun testDataProvider() = Stream.of(
+            CellTestData(currentStatus = Status.DEAD, neighborCount = 3, nextStatus = Status.ALIVE)
+    )
+
+    @ParameterizedTest
+    @MethodSource("testDataProvider")
+    fun `dead cell is reborn if it has three neighbors`(testData: CellTestData) {
+        val cell = Cell(testData.currentStatus)
+        val evolvedCell = cell.evolveWithNeighborCount(testData.neighborCount)
+        assertThat(evolvedCell.status).isEqualTo(testData.nextStatus)
     }
 
     @Test
@@ -24,6 +35,12 @@ class ATest {
         val evolvedCell = cell.evolveWithNeighborCount(2)
         assertThat(evolvedCell.status).isEqualTo(Status.ALIVE)
     }
+
+    data class CellTestData(
+            val currentStatus: Status,
+            val neighborCount: Int,
+            val nextStatus: Status
+    )
 }
 
 enum class Status {
