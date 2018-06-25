@@ -10,9 +10,13 @@ import java.util.stream.Stream
 class ATest {
 
     private fun testDataProvider() = Stream.of(
-            CellTestData(currentStatus = Status.DEAD, neighborCount = 3, nextStatus = Status.ALIVE),
-            CellTestData(currentStatus = Status.ALIVE, neighborCount = 1, nextStatus = Status.DEAD),
-            CellTestData(currentStatus = Status.ALIVE, neighborCount = 2, nextStatus = Status.ALIVE)
+            CellTestData(currentStatus = Status.ALIVE, neighborCount = 0, nextStatus = Status.DEAD, message = "dies by lonliness"),
+            CellTestData(currentStatus = Status.ALIVE, neighborCount = 1, nextStatus = Status.DEAD, message = "dies by lonliness"),
+            CellTestData(currentStatus = Status.ALIVE, neighborCount = 2, nextStatus = Status.ALIVE, message = "stays alive"),
+            CellTestData(currentStatus = Status.ALIVE, neighborCount = 3, nextStatus = Status.ALIVE, message = "stays alive"),
+            CellTestData(currentStatus = Status.DEAD, neighborCount = 3, nextStatus = Status.ALIVE, message = "is reborn"),
+            CellTestData(currentStatus = Status.ALIVE, neighborCount = 4, nextStatus = Status.DEAD, message = "dies by overpopulation"),
+            CellTestData(currentStatus = Status.ALIVE, neighborCount = 5, nextStatus = Status.DEAD, message = "dies by overpopulation")
     )
 
     @ParameterizedTest
@@ -20,10 +24,13 @@ class ATest {
     fun `follows transition rules`(testData: CellTestData) {
         val cell = Cell(testData.currentStatus)
         val evolvedCell = cell.evolveWithNeighborCount(testData.neighborCount)
-        assertThat(evolvedCell.status).isEqualTo(testData.nextStatus)
+        assertThat(evolvedCell.status)
+                .`as`(testData.message)
+                .isEqualTo(testData.nextStatus)
     }
 
     data class CellTestData(
+            val message: String,
             val currentStatus: Status,
             val neighborCount: Int,
             val nextStatus: Status
@@ -37,6 +44,6 @@ enum class Status {
 
 class Cell(val status: Status) {
     fun evolveWithNeighborCount(neighborCount: Int): Cell {
-        return if (neighborCount == 1) Cell(Status.DEAD) else Cell(Status.ALIVE)
+        return if (neighborCount < 2 || neighborCount > 3) Cell(Status.DEAD) else Cell(Status.ALIVE)
     }
 }
