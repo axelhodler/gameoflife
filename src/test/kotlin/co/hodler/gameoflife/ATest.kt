@@ -44,6 +44,10 @@ enum class Status {
 
 class Cell(val status: Status) {
     fun evolveWithNeighborCount(neighborCount: Int): Cell {
-        return if (neighborCount < 2 || neighborCount > 3) Cell(Status.DEAD) else Cell(Status.ALIVE)
+        return if (isLonely(neighborCount) || isOverpopulated(neighborCount)) Cell(Status.DEAD) else Cell(Status.ALIVE)
     }
+
+    private fun isOverpopulated(neighborCount: Int) = neighborCount > 3
+
+    private fun isLonely(neighborCount: Int) = neighborCount < 2
 }
