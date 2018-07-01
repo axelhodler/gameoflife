@@ -7,7 +7,7 @@ import org.junit.jupiter.params.provider.MethodSource
 import java.util.stream.Stream
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class ATest {
+class GameOfLifeTest {
 
     private fun testDataProvider() = Stream.of(
             CellTestData(currentStatus = Status.ALIVE, neighborCount = 0, nextStatus = Status.DEAD, message = "dies by lonliness"),
@@ -21,7 +21,7 @@ class ATest {
 
     @ParameterizedTest
     @MethodSource("testDataProvider")
-    fun `follows transition rules`(testData: CellTestData) {
+    fun `a cell follows transition rules`(testData: CellTestData) {
         val cell = Cell(testData.currentStatus)
         val evolvedCell = cell.evolveWithNeighborCount(testData.neighborCount)
         assertThat(evolvedCell.status)
