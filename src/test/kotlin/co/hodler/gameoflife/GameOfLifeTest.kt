@@ -38,6 +38,14 @@ class GameOfLifeTest {
         assertThat(universe.grid.get(Location(0, 0))).isEqualTo(Cell(Status.DEAD))
     }
 
+    @Test
+    fun `single alive cell in universe dies in next generation`() {
+        val grid = hashMapOf(Location(0, 0) to Cell(Status.ALIVE))
+        val universe = Universe(grid)
+        universe.tick()
+        assertThat(universe.grid.get(Location(0, 0))).isEqualTo(Cell(Status.DEAD))
+    }
+
     data class CellTestData(
             val message: String,
             val currentStatus: Status,
@@ -53,6 +61,7 @@ enum class Status {
 
 class Universe(val grid: HashMap<Location, Cell>) {
     fun tick() {
+        grid.set(Location(0, 0), Cell(Status.DEAD))
     }
 }
 
