@@ -1,6 +1,7 @@
 package co.hodler.gameoflife
 
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.MethodSource
@@ -29,6 +30,14 @@ class GameOfLifeTest {
                 .isEqualTo(testData.nextStatus)
     }
 
+    @Test
+    fun `single dead cell in universe stays dead`() {
+        val grid = hashMapOf(Location(0, 0) to Cell(Status.DEAD))
+        val universe = Universe(grid)
+        universe.tick()
+        assertThat(universe.grid.get(Location(0, 0))).isEqualTo(Cell(Status.DEAD))
+    }
+
     data class CellTestData(
             val message: String,
             val currentStatus: Status,
@@ -42,7 +51,14 @@ enum class Status {
     ALIVE
 }
 
-class Cell(val status: Status) {
+class Universe(val grid: HashMap<Location, Cell>) {
+    fun tick() {
+    }
+}
+
+data class Location(val x: Int, val y: Int)
+
+data class Cell(val status: Status) {
     fun evolveWithNeighborCount(neighborCount: Int): Cell {
         return if (isLonely(neighborCount) || isOverpopulated(neighborCount)) Cell(Status.DEAD) else Cell(Status.ALIVE)
     }
