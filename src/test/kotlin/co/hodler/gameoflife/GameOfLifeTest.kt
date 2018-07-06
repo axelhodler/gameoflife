@@ -90,15 +90,21 @@ enum class Status {
     ALIVE
 }
 
-class Universe(val grid: HashMap<Location, Cell>) {
+class Universe(var grid: Map<Location, Cell>) {
     fun tick() {
-        grid.set(Location(0, 0), Cell(Status.DEAD))
-        grid.set(Location(1, 0), Cell(Status.ALIVE))
-        grid.set(Location(2, 0), Cell(Status.DEAD))
+        grid = grid.mapValues {
+            it.value.evolveWithNeighborCount(it.key.getNeighborLocations()
+                    .map { grid.getOrDefault(it, Cell(Status.DEAD)) }
+                    .count { it.status.equals(Status.ALIVE) })
+        }
     }
 }
 
-data class Location(val x: Int, val y: Int)
+data class Location(val x: Int, val y: Int) {
+    fun getNeighborLocations(): List<Location> {
+        return listOf(Location(x - 1, y), Location(x + 1, y))
+    }
+}
 
 data class Cell(val status: Status) {
     fun evolveWithNeighborCount(neighborCount: Int): Cell {
