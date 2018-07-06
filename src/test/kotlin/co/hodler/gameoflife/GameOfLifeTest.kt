@@ -46,6 +46,24 @@ class GameOfLifeTest {
         assertThat(universe.grid.get(Location(0, 0))).isEqualTo(Cell(Status.DEAD))
     }
 
+    @Test
+    fun `in row of three alive cells only the middle one survives`() {
+        val grid = hashMapOf(
+                Location(0, 0) to Cell(Status.ALIVE),
+                Location(1, 0) to Cell(Status.ALIVE),
+                Location(2, 0) to Cell(Status.ALIVE)
+        )
+        val universe = Universe(grid)
+        universe.tick()
+        assertThat(universe.grid).isEqualTo(
+                hashMapOf(
+                        Location(0, 0) to Cell(Status.DEAD),
+                        Location(1, 0) to Cell(Status.ALIVE),
+                        Location(2, 0) to Cell(Status.DEAD)
+                )
+        )
+    }
+
     data class CellTestData(
             val message: String,
             val currentStatus: Status,
@@ -62,6 +80,8 @@ enum class Status {
 class Universe(val grid: HashMap<Location, Cell>) {
     fun tick() {
         grid.set(Location(0, 0), Cell(Status.DEAD))
+        grid.set(Location(1, 0), Cell(Status.ALIVE))
+        grid.set(Location(2, 0), Cell(Status.DEAD))
     }
 }
 
