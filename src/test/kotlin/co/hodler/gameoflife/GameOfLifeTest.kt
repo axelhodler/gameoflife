@@ -10,7 +10,7 @@ import java.util.stream.Stream
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class GameOfLifeTest {
 
-    private fun testDataProvider() = Stream.of(
+    private fun survivingRulesTestDataProvider() = Stream.of(
             CellTestData(currentStatus = Status.ALIVE, neighborCount = 0, nextStatus = Status.DEAD, message = "dies by lonliness"),
             CellTestData(currentStatus = Status.ALIVE, neighborCount = 1, nextStatus = Status.DEAD, message = "dies by lonliness"),
             CellTestData(currentStatus = Status.ALIVE, neighborCount = 2, nextStatus = Status.ALIVE, message = "stays alive"),
@@ -21,7 +21,7 @@ class GameOfLifeTest {
     )
 
     @ParameterizedTest
-    @MethodSource("testDataProvider")
+    @MethodSource("survivingRulesTestDataProvider")
     fun `a cell follows transition rules`(testData: CellTestData) {
         val cell = Cell(testData.currentStatus)
         val evolvedCell = cell.evolveWithNeighborCount(testData.neighborCount)
@@ -30,9 +30,17 @@ class GameOfLifeTest {
                 .isEqualTo(testData.nextStatus)
     }
 
-    @Test
-    fun `single dead cell in universe stays dead`() {
-        val grid = hashMapOf(Location(0, 0) to Cell(Status.DEAD))
+    private fun universeTickTestDataProvider() = Stream.of(
+            UniverseTestData(
+                    currentStatus = hashMapOf(Location(0, 0) to Cell(Status.DEAD)),
+                    nextStatus = hashMapOf(Location(0, 0) to Cell(Status.DEAD))
+            )
+    )
+
+    @ParameterizedTest
+    @MethodSource("universeTickTestDataProvider")
+    fun `single dead cell in universe stays dead`(testData: UniverseTestData) {
+        val grid = testData.currentStatus
         val universe = Universe(grid)
         universe.tick()
         assertThat(universe.grid.get(Location(0, 0))).isEqualTo(Cell(Status.DEAD))
@@ -69,6 +77,11 @@ class GameOfLifeTest {
             val currentStatus: Status,
             val neighborCount: Int,
             val nextStatus: Status
+    )
+
+    data class UniverseTestData(
+            val currentStatus: HashMap<Location, Cell>,
+            val nextStatus: HashMap<Location, Cell>
     )
 }
 
