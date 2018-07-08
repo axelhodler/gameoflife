@@ -14,6 +14,7 @@ class GameOfLifeTest {
             CellTestData(currentStatus = Status.ALIVE, neighborCount = 1, nextStatus = Status.DEAD, message = "dies by lonliness"),
             CellTestData(currentStatus = Status.ALIVE, neighborCount = 2, nextStatus = Status.ALIVE, message = "stays alive"),
             CellTestData(currentStatus = Status.ALIVE, neighborCount = 3, nextStatus = Status.ALIVE, message = "stays alive"),
+            CellTestData(currentStatus = Status.DEAD, neighborCount = 2, nextStatus = Status.DEAD, message = "stays dead"),
             CellTestData(currentStatus = Status.DEAD, neighborCount = 3, nextStatus = Status.ALIVE, message = "is reborn"),
             CellTestData(currentStatus = Status.ALIVE, neighborCount = 4, nextStatus = Status.DEAD, message = "dies by overpopulation"),
             CellTestData(currentStatus = Status.ALIVE, neighborCount = 5, nextStatus = Status.DEAD, message = "dies by overpopulation")
@@ -63,6 +64,40 @@ class GameOfLifeTest {
                             Location(0, 1) to Cell(Status.ALIVE),
                             Location(1, 1) to Cell(Status.ALIVE)
                     )
+            ),
+            UniverseTestData(
+                    currentStatus = hashMapOf(
+                            /**
+                             * X 0 0
+                             * 0 X 0
+                             * X 0 0
+                             */
+                            Location(0, 0) to Cell(Status.ALIVE), // northwest
+                            Location(0, 1) to Cell(Status.DEAD),
+                            Location(0, 2) to Cell(Status.ALIVE), // southwest
+                            Location(1, 0) to Cell(Status.DEAD),
+                            Location(1, 1) to Cell(Status.ALIVE), // center
+                            Location(1, 2) to Cell(Status.DEAD),
+                            Location(2, 0) to Cell(Status.DEAD),
+                            Location(2, 1) to Cell(Status.DEAD),
+                            Location(2, 2) to Cell(Status.DEAD)
+                    ),
+                    nextStatus = hashMapOf(
+                            /**
+                             * 0 0 0
+                             * X X 0
+                             * 0 0 0
+                             */
+                            Location(0, 0) to Cell(Status.DEAD), // northwest
+                            Location(0, 1) to Cell(Status.ALIVE), // reborn
+                            Location(0, 2) to Cell(Status.DEAD), // southwest
+                            Location(1, 0) to Cell(Status.DEAD), // DEAD
+                            Location(1, 1) to Cell(Status.ALIVE), // center
+                            Location(1, 2) to Cell(Status.DEAD), // DEAD
+                            Location(2, 0) to Cell(Status.DEAD),
+                            Location(2, 1) to Cell(Status.DEAD),
+                            Location(2, 2) to Cell(Status.DEAD)
+                    )
             )
     )
 
@@ -70,9 +105,8 @@ class GameOfLifeTest {
     @MethodSource("universeTickTestDataProvider")
     fun `single dead cell in universe stays dead`(testData: UniverseTestData) {
         val grid = testData.currentStatus
-        val universe = Universe(grid)
-        universe.tick()
-        assertThat(universe.grid).isEqualTo(testData.nextStatus)
+        val updatedUniverse = Universe(grid).tick()
+        assertThat(updatedUniverse.grid).isEqualTo(testData.nextStatus)
     }
 
     data class CellTestData(
@@ -94,12 +128,13 @@ enum class Status {
 }
 
 class Universe(var grid: Map<Location, Cell>) {
-    fun tick() {
-        grid = grid.mapValues {
+    fun tick(): Universe {
+        val updatedGrid = grid.mapValues {
             it.value.evolveWithNeighborCount(it.key.getNeighborLocations()
                     .map { grid.getOrDefault(it, Cell(Status.DEAD)) }
                     .count { it.status.equals(Status.ALIVE) })
         }
+        return Universe(updatedGrid);
     }
 }
 
@@ -109,17 +144,19 @@ data class Location(val x: Int, val y: Int) {
                 Location(x - 1, y), // western neighbor
                 Location(x + 1, y), // eastern neighbor
                 Location(x, y + 1), // northern neighbor
-                Location(x, y - 1) // southern neighbor
+                Location(x - 1, y + 1), // northwestern neighbor
+                Location(x, y - 1), // southern neighbor
+                Location(x - 1, y - 1) // southwestern neighbor
         )
     }
 }
 
 data class Cell(val status: Status) {
     fun evolveWithNeighborCount(neighborCount: Int): Cell {
-        return if (isLonely(neighborCount) || isOverpopulated(neighborCount)) Cell(Status.DEAD) else Cell(Status.ALIVE)
+        return if (isReborn(neighborCount) || neitherOverpopulatedNorLonely(neighborCount)) Cell(Status.ALIVE) else Cell(Status.DEAD)
     }
 
-    private fun isOverpopulated(neighborCount: Int) = neighborCount > 3
+    private fun neitherOverpopulatedNorLonely(neighborCount: Int) = status.equals(Status.ALIVE) && (neighborCount == 2 || neighborCount == 3)
 
-    private fun isLonely(neighborCount: Int) = neighborCount < 2
+    private fun isReborn(neighborCount: Int) = status.equals(Status.DEAD) && neighborCount == 3
 }
