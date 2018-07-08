@@ -99,6 +99,41 @@ class GameOfLifeTest {
                             Location(2, 1) to Cell(Status.DEAD),
                             Location(2, 2) to Cell(Status.DEAD)
                     )
+            ),
+            UniverseTestData(
+                    currentStatus = hashMapOf(
+                            /**
+                             * Glider
+                             * X O X
+                             * X X O
+                             * O O O
+                             */
+                            Location(0, 0) to Cell(Status.DEAD), // northwest
+                            Location(0, 1) to Cell(Status.DEAD),
+                            Location(0, 2) to Cell(Status.ALIVE), // southwest
+                            Location(1, 0) to Cell(Status.ALIVE),
+                            Location(1, 1) to Cell(Status.DEAD), // center
+                            Location(1, 2) to Cell(Status.ALIVE),
+                            Location(2, 0) to Cell(Status.DEAD),
+                            Location(2, 1) to Cell(Status.ALIVE),
+                            Location(2, 2) to Cell(Status.ALIVE)
+                    ),
+                    nextStatus = hashMapOf(
+                            /**
+                             * X X X
+                             * O X O
+                             * X O O
+                             */
+                            Location(0, 0) to Cell(Status.DEAD),
+                            Location(0, 1) to Cell(Status.ALIVE),
+                            Location(0, 2) to Cell(Status.DEAD),
+                            Location(1, 0) to Cell(Status.DEAD),
+                            Location(1, 1) to Cell(Status.DEAD),
+                            Location(1, 2) to Cell(Status.ALIVE),
+                            Location(2, 0) to Cell(Status.DEAD),
+                            Location(2, 1) to Cell(Status.ALIVE),
+                            Location(2, 2) to Cell(Status.ALIVE)
+                    )
             )
     )
 
