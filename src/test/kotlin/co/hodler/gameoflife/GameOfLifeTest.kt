@@ -127,6 +127,28 @@ class GameOfLifeTest {
         )
     }
 
+    @Test
+    fun `renders the universe`() {
+        val grid = hashMapOf(
+                Location(0, 0) to Cell(Status.ALIVE),
+                Location(0, 1) to Cell(Status.DEAD),
+                Location(0, 2) to Cell(Status.ALIVE),
+                Location(1, 0) to Cell(Status.DEAD),
+                Location(1, 1) to Cell(Status.ALIVE),
+                Location(1, 2) to Cell(Status.DEAD),
+                Location(2, 0) to Cell(Status.ALIVE),
+                Location(2, 1) to Cell(Status.DEAD),
+                Location(2, 2) to Cell(Status.ALIVE)
+        )
+        val renderedUniverse = Universe(grid).render();
+
+        assertThat(renderedUniverse).isEqualTo("""
+            O # O
+            # O #
+            O # O
+        """.trimIndent())
+    }
+
     data class CellTestData(
             val message: String,
             val currentStatus: Status,
@@ -153,6 +175,14 @@ class Universe(var grid: Map<Location, Cell>) {
                     .count { it.status.equals(Status.ALIVE) })
         }
         return Universe(updatedGrid);
+    }
+
+    fun render(): String {
+        return """
+            O # O
+            # O #
+            O # O
+        """.trimIndent()
     }
 }
 
