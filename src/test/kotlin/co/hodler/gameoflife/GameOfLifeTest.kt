@@ -1,7 +1,6 @@
 package co.hodler.gameoflife
 
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.MethodSource
@@ -34,6 +33,22 @@ class GameOfLifeTest {
             UniverseTestData(
                     currentStatus = hashMapOf(Location(0, 0) to Cell(Status.DEAD)),
                     nextStatus = hashMapOf(Location(0, 0) to Cell(Status.DEAD))
+            ),
+            UniverseTestData(
+                    currentStatus = hashMapOf(Location(0, 0) to Cell(Status.ALIVE)),
+                    nextStatus = hashMapOf(Location(0, 0) to Cell(Status.DEAD))
+            ),
+            UniverseTestData(
+                    currentStatus = hashMapOf(
+                            Location(0, 0) to Cell(Status.ALIVE),
+                            Location(1, 0) to Cell(Status.ALIVE),
+                            Location(2, 0) to Cell(Status.ALIVE)
+                    ),
+                    nextStatus = hashMapOf(
+                            Location(0, 0) to Cell(Status.DEAD),
+                            Location(1, 0) to Cell(Status.ALIVE),
+                            Location(2, 0) to Cell(Status.DEAD)
+                    )
             )
     )
 
@@ -43,33 +58,7 @@ class GameOfLifeTest {
         val grid = testData.currentStatus
         val universe = Universe(grid)
         universe.tick()
-        assertThat(universe.grid.get(Location(0, 0))).isEqualTo(Cell(Status.DEAD))
-    }
-
-    @Test
-    fun `single alive cell in universe dies in next generation`() {
-        val grid = hashMapOf(Location(0, 0) to Cell(Status.ALIVE))
-        val universe = Universe(grid)
-        universe.tick()
-        assertThat(universe.grid.get(Location(0, 0))).isEqualTo(Cell(Status.DEAD))
-    }
-
-    @Test
-    fun `in row of three alive cells only the middle one survives`() {
-        val grid = hashMapOf(
-                Location(0, 0) to Cell(Status.ALIVE),
-                Location(1, 0) to Cell(Status.ALIVE),
-                Location(2, 0) to Cell(Status.ALIVE)
-        )
-        val universe = Universe(grid)
-        universe.tick()
-        assertThat(universe.grid).isEqualTo(
-                hashMapOf(
-                        Location(0, 0) to Cell(Status.DEAD),
-                        Location(1, 0) to Cell(Status.ALIVE),
-                        Location(2, 0) to Cell(Status.DEAD)
-                )
-        )
+        assertThat(universe.grid).isEqualTo(testData.nextStatus)
     }
 
     data class CellTestData(
