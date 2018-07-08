@@ -49,6 +49,20 @@ class GameOfLifeTest {
                             Location(1, 0) to Cell(Status.ALIVE),
                             Location(2, 0) to Cell(Status.DEAD)
                     )
+            ),
+            UniverseTestData(
+                    currentStatus = hashMapOf(
+                            Location(0, 0) to Cell(Status.ALIVE),
+                            Location(1, 0) to Cell(Status.ALIVE),
+                            Location(0, 1) to Cell(Status.ALIVE),
+                            Location(1, 1) to Cell(Status.ALIVE)
+                    ),
+                    nextStatus = hashMapOf(
+                            Location(0, 0) to Cell(Status.ALIVE),
+                            Location(1, 0) to Cell(Status.ALIVE),
+                            Location(0, 1) to Cell(Status.ALIVE),
+                            Location(1, 1) to Cell(Status.ALIVE)
+                    )
             )
     )
 
@@ -91,7 +105,12 @@ class Universe(var grid: Map<Location, Cell>) {
 
 data class Location(val x: Int, val y: Int) {
     fun getNeighborLocations(): List<Location> {
-        return listOf(Location(x - 1, y), Location(x + 1, y))
+        return listOf(
+                Location(x - 1, y), // western neighbor
+                Location(x + 1, y), // eastern neighbor
+                Location(x, y + 1), // northern neighbor
+                Location(x, y - 1) // southern neighbor
+        )
     }
 }
 
