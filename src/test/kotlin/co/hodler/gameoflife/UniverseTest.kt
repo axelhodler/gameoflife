@@ -1,14 +1,13 @@
 package co.hodler.gameoflife
 
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.MethodSource
 import java.util.stream.Stream
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class GameOfLifeTest {
+class UniverseTest {
 
     private fun universeTickTestDataProvider() = Stream.of(
             UniverseTestData(
@@ -124,52 +123,9 @@ class GameOfLifeTest {
         assertThat(updatedUniverse.grid).isEqualTo(testData.nextStatus)
     }
 
-    @Test
-    fun `location knows its neighboring locations`() {
-        val location = Location(1, 1)
-
-        assertThat(location.getNeighborLocations()).containsExactlyInAnyOrder(
-                Location(0, 0),
-                Location(0, 1),
-                Location(0, 2),
-                Location(1, 0),
-                // center
-                Location(1, 2),
-                Location(2, 0),
-                Location(2, 1),
-                Location(2, 2)
-        )
-    }
-
     data class UniverseTestData(
             val currentStatus: HashMap<Location, Cell>,
             val nextStatus: HashMap<Location, Cell>
     )
-}
-
-class Universe(var grid: Map<Location, Cell>) {
-    fun tick(): Universe {
-        val updatedGrid = grid.mapValues {
-            it.value.evolveWithNeighborCount(it.key.getNeighborLocations()
-                    .map { grid.getOrDefault(it, Cell(Status.DEAD)) }
-                    .count { it.status.equals(Status.ALIVE) })
-        }
-        return Universe(updatedGrid);
-    }
-}
-
-data class Location(val x: Int, val y: Int) {
-    fun getNeighborLocations(): List<Location> {
-        return listOf(
-                Location(x - 1, y), // western neighbor
-                Location(x + 1, y), // eastern neighbor
-                Location(x, y + 1), // northern neighbor
-                Location(x - 1, y + 1), // northwestern neighbor
-                Location(x + 1, y + 1), // northeaster neighbor
-                Location(x, y - 1), // southern neighbor
-                Location(x - 1, y - 1), // southwestern neighbor
-                Location(x + 1, y - 1) // southeastern neighbor
-        )
-    }
 }
 
