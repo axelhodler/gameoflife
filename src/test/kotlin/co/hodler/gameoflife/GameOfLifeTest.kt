@@ -175,11 +175,6 @@ class GameOfLifeTest {
     )
 }
 
-enum class Status {
-    DEAD,
-    ALIVE
-}
-
 class Universe(var grid: Map<Location, Cell>) {
     fun tick(): Universe {
         val updatedGrid = grid.mapValues {
@@ -206,12 +201,3 @@ data class Location(val x: Int, val y: Int) {
     }
 }
 
-data class Cell(val status: Status) {
-    fun evolveWithNeighborCount(neighborCount: Int): Cell {
-        return if (isReborn(neighborCount) || neitherOverpopulatedNorLonely(neighborCount)) Cell(Status.ALIVE) else Cell(Status.DEAD)
-    }
-
-    private fun neitherOverpopulatedNorLonely(neighborCount: Int) = status.equals(Status.ALIVE) && (neighborCount == 2 || neighborCount == 3)
-
-    private fun isReborn(neighborCount: Int) = status.equals(Status.DEAD) && neighborCount == 3
-}
